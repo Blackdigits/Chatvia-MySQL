@@ -120,7 +120,7 @@ exports.signin = catchAsync(async (req, res, next) => {
             const hashedPassword = result[0].password;
             if (await bcrypt.compare(password, hashedPassword)) 
             { 
-                await dbConnect.query("UPDATE users SET location = '" +locations+ "' where email ='"+email+"'", function (err, result) {
+                await dbConnect.query("UPDATE users SET location = '" +location+ "' where email ='"+email+"'", function (err, result) {
                     if (err) throw err;
                 });
                 createSendToken(user, 200, res, 'Login Successfully');
