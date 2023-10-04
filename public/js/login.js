@@ -1,5 +1,29 @@
+function checkCookie(cookieName) {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.startsWith(cookieName + '=')) {
+        return true; // Cookie found
+      }
+    }
+    return false; // Cookie not found
+}
+
+function checkLocalStorageItem(key) {
+    const value = localStorage.getItem(key);
+    return value !== null;
+}
+
+const cookieName = 'logged';
+const isCookiePresent = checkCookie(cookieName);
+console.log(`Cookie "${cookieName}" is present: ${isCookiePresent}`);
+
+const localStorageKey = 'currentUser';
+const isLocalStorageValuePresent = checkLocalStorageItem(localStorageKey);
+console.log(`Local Storage value for key "${localStorageKey}" is present: ${isLocalStorageValuePresent}`);
+
 const auth_key = new URLSearchParams(window.location.search).get('auth_key');
-if (auth_key) { 
+if (auth_key) { // && !isCookiePresent
     const app_id = "22342555549952";
     const app_secret = "97a6f9e1b11edea3fd6cd3f33806eaae";
     const url = `https://onetouch.co.id/api/authorize?app_id=${app_id}&app_secret=${app_secret}&auth_key=${auth_key}`;
@@ -38,7 +62,8 @@ if (auth_key) {
             document.querySelector(".loader_bg").style.display = "none";
         }
     });
-}
+}// else if (isCookiePresent && isLocalStorageValuePresent){ location.assign('/'); }
+
 // Login
 if (document.getElementsByClassName('form').length) {
     document.querySelector('.form').addEventListener('submit', e => {
