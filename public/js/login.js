@@ -1,3 +1,44 @@
+const auth_key = new URLSearchParams(window.location.search).get('auth_key');
+if (auth_key) { 
+    const app_id = "22342555549952";
+    const app_secret = "97a6f9e1b11edea3fd6cd3f33806eaae";
+    const url = `https://onetouch.co.id/api/authorize?app_id=${app_id}&app_secret=${app_secret}&auth_key=${auth_key}`;
+
+    document.querySelector(".loader").style.display = "block";
+    document.querySelector(".loader_bg").style.display = "block";
+
+    fetch(url)
+    .then(response => response.json())
+    .then(json => {
+        if (json.access_token) {
+          console.log(json);
+          const access_token = json.access_token;
+          const get_user_info_url = `https://onetouch.co.id/api/get_user_info?access_token=${access_token}`; 
+        
+            fetch(get_user_info_url)
+                .then(response => response.json())
+                .then(info => {
+                const password = info.user_info.user_registered;
+                const email = info.user_info.user_email;
+                const name = info.user_info.user_name;
+                const clientIP = info.user_info.currentIP;
+
+                const signinFormData = new FormData();   
+
+                signinFormData.append("location", clientIP);
+                signinFormData.append("password", password);
+                signinFormData.append("email", email);
+                signinFormData.append("name", name);
+
+                login(signinFormData);
+            });
+        } else {
+            toastr.error(json.message, 'Error');
+            document.querySelector(".loader").style.display = "none";
+            document.querySelector(".loader_bg").style.display = "none";
+        }
+    });
+}
 // Login
 if (document.getElementsByClassName('form').length) {
     document.querySelector('.form').addEventListener('submit', e => {
@@ -25,6 +66,9 @@ const login = async (formData) => {
             toastr.error(res.data.message, 'Error');
             document.querySelector(".loader").style.display = "none";
             document.querySelector(".loader_bg").style.display = "none";
+        }
+        if (res.data.status === 'unregistered') {  
+            register(formData);
         }
         if (res.data.status === 'success') {
             toastr.success(res.data.message, 'Success');
@@ -80,7 +124,7 @@ const register = async (formData) => {
             window.setTimeout(() => {
                 document.querySelector(".loader").style.display = "none";
                 document.querySelector(".loader_bg").style.display = "none";
-                location.assign('/login');
+                login(formData);
             }, 1500);
         }
     }

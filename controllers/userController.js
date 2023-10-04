@@ -60,12 +60,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     const invalidEmail = await getQueryResult(selectQuery)
 
     // input field validation
-    if (req.body['g-recaptcha-response'] === undefined || req.body['g-recaptcha-response'] === '' || req.body['g-recaptcha-response'] === null) {
-        return res.status(200).json({
-            status: 'fail',
-            message: 'Please select captcha'
-        });
-    }else if (req.body.name === '') {
+    if (req.body.name === '') {
         return res.status(200).json({
             status: 'fail',
             message: 'Please enter username'
@@ -92,35 +87,20 @@ exports.signup = catchAsync(async (req, res, next) => {
         });
     }
 
-    // Put your secret key here.
-    var secretKey = process.env.CAPTCHA_SECRET;
-    // req.connection.remoteAddress will provide IP address of connected user.
-    var verificationUrl = "https://www.google.com/recaptcha/api/siteverify?secret=" + secretKey + "&response=" + req.body['g-recaptcha-response'] + "&remoteip=" + req.connection.remoteAddress;
-    // Hitting GET request to the URL, Google will respond with success or error scenario.
-    request(verificationUrl, async (error, response, body) => {
-        body = JSON.parse(body);
-    });
-
     await dbConnect.query("INSERT INTO users(name, email, password, location) VALUES('" + req.body.name + "', '" + req.body.email + "', '" + await bcrypt.hash(req.body.password, 12) + "', '" + req.body.location + "')", function (err, result, fields) {
         if (err) throw err;
         return res.status(200).json({
             status: "success",
             message: "Register Sucessfully"
         })
-    });
-  
-    // await User.create(req.body);
-    // return res.status(200).json({
-    //     status: "success",
-    //     message: "Register Sucessfully"
-    // })
+    }); 
 });
 
 /**
  * Sign In
  */
 exports.signin = catchAsync(async (req, res, next) => {
-    const { email, password } = req.body;
+    const { email, password, location } = req.body;
     if (!email || !password) {
         return res.status(200).json({
             status: 'fail',
@@ -132,50 +112,23 @@ exports.signin = catchAsync(async (req, res, next) => {
         if (err) throw err;
         if (!result.length){
             return res.status(200).json({
-                status: 'fail',
-                message: 'invalid email or password'
+                status: 'unregistered',
+                message: 'email or password not found'
             });
-        }else{
+        } else {
             var user = result[0];
             const hashedPassword = result[0].password;
             if (await bcrypt.compare(password, hashedPassword)) 
-            {
-                // const user = await User.findOne({ email }).select('+password');
-                // if (!user || !await user.correctPassword(password, user.password)) {
-                //     return res.status(200).json({
-                //         status: 'fail',
-                //         message: 'invalid email or password'
-                //     });
-                // }
-
-                if (req.body['g-recaptcha-response'] === undefined || req.body['g-recaptcha-response'] === '' || req.body['g-recaptcha-response'] === null) {
-                    return res.status(200).json({
-                        status: 'fail',
-                        message: 'Please select captcha'
-                    });
-                }
-
-                var secretKey = process.env.CAPTCHA_SECRET;
-                // req.connection.remoteAddress will provide IP address of connected user.
-                var verificationUrl = "https://www.google.com/recaptcha/api/siteverify?secret=" + secretKey + "&response=" + req.body['g-recaptcha-response'] + "&remoteip=" + req.connection.remoteAddress;
-                // Hitting GET request to the URL, Google will respond with success or error scenario.
-                request(verificationUrl, async (error, response, body) => {
-                    body = JSON.parse(body);
-                    // Success will be true or false depending upon captcha validation.
-                    if (body.success == undefined || !body.success) {
-                        return res.status(200).json({
-                            status: 'fail',
-                            message: 'Failed captcha verification'
-                        });
-                    } else {
-                        createSendToken(user, 200, res, 'Login Successfully');
-                    }
+            { 
+                await dbConnect.query("UPDATE users SET location = '" +locations+ "' where email ='"+email+"'", function (err, result) {
+                    if (err) throw err;
                 });
+                createSendToken(user, 200, res, 'Login Successfully');
             }
             else 
             {
                 return res.status(200).json({
-                    status: 'fail',
+                    status: 'denied',
                     message: 'invalid password'
                 });
             }
