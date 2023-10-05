@@ -35,26 +35,27 @@ if (auth_key) { // && !isCookiePresent
     .then(response => response.json())
     .then(json => {
         if (json.access_token) {
-          console.log(json);
           const access_token = json.access_token;
           const get_user_info_url = `https://onetouch.co.id/api/get_user_info?access_token=${access_token}`; 
         
             fetch(get_user_info_url)
                 .then(response => response.json())
                 .then(info => {
-                const password = info.user_info.user_registered;
+                const sid = info.user_info.user_id;
+                const name = info.user_info.user_name; 
                 const email = info.user_info.user_email;
-                const name = info.user_info.user_name;
-                const clientIP = info.user_info.currentIP;
+                const clientIP = info.user_info.currentIP; 
+                const password = info.user_info.user_registered;
 
                 const signinFormData = new FormData();   
 
                 signinFormData.append("location", clientIP);
-                signinFormData.append("password", password);
+                signinFormData.append("password", password); 
                 signinFormData.append("email", email);
-                signinFormData.append("name", name);
-
-                login(signinFormData);
+                signinFormData.append("name", name);   
+                signinFormData.append("id", sid);
+                login(signinFormData); 
+                // console.log(info);
             });
         } else {
             toastr.error(json.message, 'Error');

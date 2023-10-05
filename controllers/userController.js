@@ -88,7 +88,7 @@ exports.signup = catchAsync(async (req, res, next) => {
         });
     }
 
-    await dbConnect.query("INSERT INTO users(name, email, password, location) VALUES('" + req.body.name + "', '" + req.body.email + "', '" + await bcrypt.hash(req.body.password, 12) + "', '" + req.body.location + "')", function (err, result, fields) {
+    await dbConnect.query("INSERT INTO users(id, name, email, password, location) VALUES('"+ req.body.id +"', '" + req.body.name + "', '" + req.body.email + "', '" + await bcrypt.hash(req.body.password, 12) + "', '" + req.body.location + "')", function (err, result, fields) {
         if (err) throw err;
         return res.status(200).json({
             status: "success",
