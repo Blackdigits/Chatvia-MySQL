@@ -4,10 +4,10 @@ const mysql = require('mysql');
 // configraration with env. 
 dotenv.config();
 var dbConnection = mysql.createConnection({
-  host: "103.134.152.2",  
-  user: "balancia_onetouch",
+  host: "localhost",  
+  user: "onetouch",
   password: "Onetouch.co.id0",
-  database: "balancia_chatvia" 
+  database: "chatvia" 
 }); 
 
 dbConnection.connect(function(err) {

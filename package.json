@@ -1,13 +1,13 @@
 {
-  "name": "Chatvia Chat App",
+  "name": "Onetouch Chat App",
   "version": "1.0.0",
-  "description": "",
+  "description": "Group Chat",
   "main": "app.js",
   "scripts": {
     "start": "nodemon app.js",
     "start:prod": "NODE_ENV=production nodemon app.js"
   },
-  "author": "Themesbrand",
+  "author": "Al Bahza'a",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.24.0",
@@ -30,6 +30,6 @@
     "validator": "^13.7.0"
   },
   "engines": {
-    "node": ">=10.0.0"
+    "node": ">=16.0.0"
   }
 }
