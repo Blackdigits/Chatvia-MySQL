@@ -129,7 +129,7 @@ async function contactList(userId) {
   // ]);
   // var selectQuery = "Select contacts.name,contacts.email,contacts.user_id,contacts.created_by,users.image,users.createdAt,users.location,(SELECT message,file_upload,createdAt from messages WHERE messages.sender_id = contacts.user_id ORDER BY messages.id desc LIMIT 1) from contacts JOIN users ON users.id = contacts.user_id where contacts.created_by ="+userId+" order by contacts.name ASC"
 
-  var selectQuery = "Select DISTINCT contacts.name,contacts.email,contacts.user_id,contacts.created_by,users.image as userImg,users.createdAt,users.location,(SELECT message from messages WHERE sender_id = "+userId+" ORDER BY id DESC LIMIT 1) as message,(SELECT file_upload from messages WHERE sender_id = "+userId+" ORDER BY id DESC LIMIT 1) as file_upload,(SELECT createdAt from messages WHERE sender_id = "+userId+" ORDER BY id DESC LIMIT 1) as created_at from contacts LEFT JOIN users ON users.id = contacts.user_id where contacts.created_by = "+userId+" order by contacts.name ASC"
+  var selectQuery = "Select DISTINCT contacts.name,contacts.email,contacts.user_id,contacts.created_by,users.image as userImg,users.createdAt,users.location,(SELECT message from messages WHERE sender_id = "+userId+" ORDER BY id DESC LIMIT 1) as message,(SELECT file_upload from messages WHERE sender_id = "+userId+" ORDER BY id DESC LIMIT 1) as file_upload,(SELECT createdAt from messages WHERE sender_id = "+userId+" ORDER BY id DESC LIMIT 1) as created_at from contacts LEFT JOIN users ON users.id = contacts.user_id where contacts.created_by = "+userId+" AND contacts.user_id IN (SELECT id FROM `users`) order by contacts.name ASC"
   const users = await getQueryMultipleResult(selectQuery)
   return users;
 }
