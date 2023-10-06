@@ -7,7 +7,8 @@ var dbConnection = mysql.createConnection({
   host: "localhost",  
   user: "onetouch",
   password: "Onetouch.co.id0",
-  database: "chatvia" 
+  database: "chatvia",
+  charset : 'utf8mb4'
 }); 
 
 dbConnection.connect(function(err) {
