@@ -172,12 +172,12 @@ const register = async (formData) => {
     }
 };
 
-// Logout
+/* Logout
 if (document.getElementsByClassName('nav-logout').length) {
     document.querySelector('.nav-logout').addEventListener('click', async () => {
         logout();
     });
-}
+} */
 
 const logout = async () => {
     const res = await axios({
